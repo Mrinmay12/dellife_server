@@ -7,7 +7,7 @@ import UserRoutes from "./Routes/UserRoutes.js"
 import dotenv from 'dotenv';
 dotenv.config();
 
-const PORT = process.env.PORT || 9000;
+const PORT = process.env.PORT;
 const REACT_PORT = process.env.REACT_PORT || 'http://localhost:3000'; // Update with your React app's origin
 
 const app = fastify(); 
