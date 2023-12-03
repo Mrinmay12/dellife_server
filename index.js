@@ -7,7 +7,7 @@ import UserRoutes from "./Routes/UserRoutes.js"
 import dotenv from 'dotenv';
 dotenv.config();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT ;
 const REACT_PORT = process.env.REACT_PORT || 'http://localhost:3000'; // Update with your React app's origin
 
 const app = fastify(); 
@@ -36,10 +36,16 @@ const start = async () => {
 };
 
 start();
-
-const socketport = app.listen(PORT, () => {
-    console.log("App start " + PORT);
-  });
+const socketport = app.listen(PORT, (err, address) => {
+  if (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
+  console.log(`Server listening at ${address}`);
+});
+// const socketport = app.listen(PORT, () => {
+//     console.log("App start " + PORT);
+//   });
   
   const io = new Server(socketport, {
     cors: {
