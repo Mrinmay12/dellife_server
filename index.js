@@ -7,8 +7,9 @@ import UserRoutes from "./Routes/UserRoutes.js"
 import dotenv from 'dotenv';
 dotenv.config();
 
-const PORT = process.env.PORT ;
+const PORT = process.env.PORT || 3000;;
 const REACT_PORT = process.env.REACT_PORT || 'http://localhost:3000'; // Update with your React app's origin
+const host = ("RENDER" in process.env) ? `0.0.0.0` : `localhost`;
 
 const app = fastify(); 
 await app.register(cors, { 
@@ -36,7 +37,7 @@ const start = async () => {
 };
 
 start();
-const socketport = app.listen(PORT, (err, address) => {
+const socketport = app.listen({host: host, port: PORT },(err, address) => {
   if (err) {
     app.log.error(err);
     process.exit(1);
