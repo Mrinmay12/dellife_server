@@ -5,6 +5,8 @@ import fastifyMultipart from 'fastify-multipart';
 import connectDB from './DatabaseConnection/Database.js';
 import UserRoutes from "./Routes/UserRoutes.js"
 import PostRoutes  from "./Routes/PostRoutes.js"
+import SettingRoutes from "./Routes/SettingRoutes.js"
+import OtherUserRoutes from "./Routes/AnotherUserRoutes.js"
 
 // Load environment variables
 import dotenv from 'dotenv';
@@ -26,9 +28,13 @@ await app.register(cors, {
 // });
 
 app.register(fastifyMultipart)
+
 // Routes
 app.register(UserRoutes)
 app.register(PostRoutes)
+app.register(SettingRoutes)
+app.register(OtherUserRoutes)
+
 app.get('/', async (req, res) => {
   return { message: 'Welcome to FirstConnect server' };
 });

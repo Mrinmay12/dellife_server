@@ -2,6 +2,7 @@ import Post from "../Models/Postmodel.js";
 import User from '../Models/UserLogin.js';
 import admin from "firebase-admin"
 import ServiceAccount from "../Utiles/serviceAccount.json" assert {type: "json"}
+import { UserProfilePic } from "../Utiles/Utiles.js";
 
 admin.initializeApp({
     credential: admin.credential.cert(ServiceAccount),
@@ -71,7 +72,7 @@ const Userdetail = async (userIds) => {
         const users = await User.find({ user_id: { $in: userIds } });
         const userMap = {};
         users.forEach((user) => {
-            userMap[user.user_id] = { name: user.name, email: user.email };
+            userMap[user.user_id] = { name: user.name, email: user.sex };
         });
         return userMap;
     } catch (error) {
@@ -104,17 +105,20 @@ export const GetAllPost = async (req, res) => {
         });
 
 
-        const userdata = sortedPosts.map((post) => ({
-            Title: post.post_title,
-            Textstyle: post.textstyle,
-            Username: post.username,
-            Postimage: post.post_img,
-            Color: post.color_code,
-            createdAt: post.createdAt,
-            user_id: post.user_id,
-            post_id: post._id,
-            user_name: userMap[post.user_id] ? userMap[post.user_id].name : 'Unknown User',
-            user_email: userMap[post.user_id] ? userMap[post.user_id].email : 'Unknown Email',
+        const userdata = await Promise.all(sortedPosts.map(async (post) => {
+            const userProfilePic = await UserProfilePic(post.user_id,userMap[post.user_id] ? userMap[post.user_id].sex : "1");
+            return {
+                Title: post.post_title,
+                Textstyle: post.textstyle,
+                Username: post.username,
+                Postimage: post.post_img,
+                Color: post.color_code,
+                createdAt: post.createdAt,
+                // user_id: post.user_id,
+                post_id: post._id,
+                user_name: userMap[post.user_id] ? userMap[post.user_id].name : 'Unknown User',
+                user_pic: userProfilePic
+            }
         }))
         // userdata.sort((a, b) => colorOrder[a.Color] - colorOrder[b.Color]);
 
@@ -140,6 +144,7 @@ export const GetPerticularPost = async (req, res) => {
         } else {
 
             const userMap = await Userdetail(post.user_id);
+            let user_pic = await UserProfilePic(post.user_id, userMap[post.user_id] ? userMap[post.user_id].sex : "1")
             let post_data = {
                 Title: post.post_title,
                 Textstyle: post.textstyle,
@@ -147,10 +152,10 @@ export const GetPerticularPost = async (req, res) => {
                 Postimage: post.post_img,
                 Color: post.color_code,
                 createdAt: post.createdAt,
-                user_id: post.user_id,
+                // user_id: post.user_id,
                 post_id: post._id,
                 user_name: userMap[post.user_id] ? userMap[post.user_id].name : 'Unknown User',
-
+                user_pic: user_pic
             }
             res.status(200).send({ post: post_data })
         }
@@ -167,14 +172,14 @@ export const PostUpdate = async (req, res) => {
         const { post_title, color_code, textstyle } = req.body
         const post_update = await Post.findOne({ _id: post_id })
         if (user_id === post_update.user_id) {
-         
-            post_update.post_title= post_title,
-            post_update.color_code= color_code,
-            post_update.textstyle= textstyle
-          
+
+            post_update.post_title = post_title,
+                post_update.color_code = color_code,
+                post_update.textstyle = textstyle
+
             post_update.save()
             res.status(200).send({ message: "Post Update" })
-        }else{
+        } else {
             res.status(400).send({ message: "Only admin Post Update" })
         }
     } catch (err) {

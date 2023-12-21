@@ -24,16 +24,6 @@ import {
      fastify.get("/api/user/getuser",getAllUser)
      fastify.get("/api/user/userprofile/:user_id",UserProfile)
   }
-// const router=fastify()
 
-// router.post("/newuser",Creatuser)
-// router.post("/login",Login)
-// router.post("/resetpassword",Resetpassword)
-// router.post("/forgetpassword",Forgetpassword)
-// router.put("/updateuser",UpdateUser)
-// router.get("/searchuser",AdvenceSearch)
-// // router.get("/verifytoken",verifyToken,UserVerify)
-// router.get("/getuser",getAllUser)
-// router.get("/userprofile/:user_id",UserProfile)
 
 export default routes
